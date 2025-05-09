@@ -36,6 +36,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         final String jwt;
         final String userEmail;
 
+        final String path = request.getRequestURI();
+        
+        if (path.startsWith("/auth") || 
+            path.startsWith("/v3/api-docs") || 
+            path.startsWith("/swagger-ui") || 
+            path.startsWith("/swagger-resources") || 
+            path.startsWith("/webjars")) {
+
+                filterChain.doFilter(request, response);
+                return;
+            }
+
         //checks if the header is not null and if it doesnt start with the word "Bearer"
         if (autHeader == null || !autHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, response);
@@ -64,9 +76,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
-        filterChain.doFilter(request, response);
+
         
-       }
+    }
+    filterChain.doFilter(request, response);
 
     }
 
